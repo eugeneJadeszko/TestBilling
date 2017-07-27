@@ -16,4 +16,8 @@ public class RecordService {
 	public Set<CallRecord> findAll() {
 		return (Set<CallRecord>) repository.findAll();
 	}
+
+	public void deleteAll() {
+		repository.deleteAll();
+	}
 }

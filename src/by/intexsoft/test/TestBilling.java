@@ -1,49 +1,91 @@
 package by.intexsoft.test;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.Properties;
 import java.util.Set;
 
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.testng.Assert;
-import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import by.intexsoft.test.model.CallRecord;
 import by.intexsoft.test.service.RecordService;
 
 public class TestBilling {
-	Set<CallRecord> sourceSet = new HashSet<>();
+	private static String pathToApp, pathToMessageDir;
+	AnnotationConfigApplicationContext context;
 	ObjectMapper mapper = new ObjectMapper();
+	RecordService service;
+	Set<CallRecord> sourceSet = new HashSet<>();
+	Set<CallRecord> rezultSet;
+	File[] arrayFiles;
 
-	@BeforeMethod
-	private void startBilling() throws IOException, InterruptedException {
-		Process p = Runtime.getRuntime().exec("D:/work/CouchBaseRabbit/start.bat");
-		p.getInputStream();
-		Thread.sleep(15000);
-		Runtime.getRuntime().exec("taskkill /F /IM java.exe");
+	static {
+		Properties properties = new Properties();
+		try (FileInputStream fr = new FileInputStream("resources/application.properties")) {
+			properties.load(fr);
+		} catch (IOException e) {
+			System.out.println("file properties not found");
+		}
+		pathToApp = properties.getProperty("path.to.test.app");
+		pathToMessageDir = properties.getProperty("directory.read");
 	}
 
+	/**
+	 * This method compares objects from CouchBase with source objects from
+	 * directory
+	 */
 	@Test
-	public void check() throws InterruptedException, JsonParseException, IOException {
-		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext("by.intexsoft.test.config");
-		RecordService service = context.getBean(RecordService.class);
+	public void check() {
+		Assert.assertNotEqualsDeep(rezultSet, sourceSet);
+	}
+
+	/**
+	 * This method starting tests application, configure TestBilling app and
+	 * gets set of files from CouchBase
+	 */
+	@BeforeClass
+	private void startBilling() throws IOException, InterruptedException {
+		Process p = Runtime.getRuntime().exec(pathToApp);
+		p.getInputStream();
+		Thread.sleep(10000);
+		Runtime.getRuntime().exec("taskkill /F /IM java.exe");
+		context = new AnnotationConfigApplicationContext("by.intexsoft.test.config");
+		service = context.getBean(RecordService.class);
 		for (File item : getFiles()) {
 			CallRecord record = mapper.readValue(item, CallRecord.class);
 			sourceSet.add(record);
 		}
-		Set<CallRecord> rezultSet = service.findAll();
-		context.close();
-		Assert.assertNotEqualsDeep(rezultSet, sourceSet);
+		rezultSet = service.findAll();
 	}
 
+	/**
+	 * This method clears the database and directory after the test
+	 */
+	@AfterMethod
+	public void clear() {
+		service.deleteAll();
+		for (File item : arrayFiles) {
+			item.delete();
+		}
+		context.close();
+	}
+
+	/**
+	 * This method gets a set of source files from the directory
+	 * 
+	 * @return File[] - set of source files
+	 */
 	public File[] getFiles() {
-		File dir = new File("D:/work/read_messages");
-		File[] arrayFiles = dir.listFiles();
+		File dir = new File(pathToMessageDir);
+		arrayFiles = dir.listFiles();
 		return arrayFiles;
 	}
 }
