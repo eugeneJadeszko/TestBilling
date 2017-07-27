@@ -13,6 +13,7 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import by.intexsoft.test.model.CallRecord;
@@ -59,10 +60,7 @@ public class TestBilling {
 		Runtime.getRuntime().exec("taskkill /F /IM java.exe");
 		context = new AnnotationConfigApplicationContext("by.intexsoft.test.config");
 		service = context.getBean(RecordService.class);
-		for (File item : getFiles()) {
-			CallRecord record = mapper.readValue(item, CallRecord.class);
-			sourceSet.add(record);
-		}
+		sourceSet = getFileSet();
 		rezultSet = service.findAll();
 	}
 
@@ -83,9 +81,22 @@ public class TestBilling {
 	 * 
 	 * @return File[] - set of source files
 	 */
-	public File[] getFiles() {
+	public File[] getFilesFromDir() {
 		File dir = new File(pathToMessageDir);
 		arrayFiles = dir.listFiles();
 		return arrayFiles;
+	}
+
+	/**
+	 * This method return a collection of source files from the directory
+	 * 
+	 * @return Set<CallRecord>
+	 */
+	public Set<CallRecord> getFileSet() throws IOException, JsonMappingException {
+		for (File item : getFilesFromDir()) {
+			CallRecord record = mapper.readValue(item, CallRecord.class);
+			sourceSet.add(record);
+		}
+		return sourceSet;
 	}
 }
