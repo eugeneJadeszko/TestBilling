@@ -1,4 +1,4 @@
-package by.intexsoft.test;
+package test.by.intexsoft.testBilling;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -11,16 +11,17 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import by.intexsoft.test.model.CallRecord;
-import by.intexsoft.test.service.RecordService;
+import main.by.intexsoft.testBilling.model.CallRecord;
+import main.by.intexsoft.testBilling.service.RecordService;
 
 public class TestBilling {
-	private static String pathToApp, pathToMessageDir;
+	private static String pathToMessageDir;
 	AnnotationConfigApplicationContext context;
 	ObjectMapper mapper = new ObjectMapper();
 	RecordService service;
@@ -35,7 +36,6 @@ public class TestBilling {
 		} catch (IOException e) {
 			System.out.println("file properties not found");
 		}
-		pathToApp = properties.getProperty("path.to.test.app");
 		pathToMessageDir = properties.getProperty("directory.read");
 	}
 
@@ -49,16 +49,17 @@ public class TestBilling {
 	}
 
 	/**
-	 * This method starting tests application, configure TestBilling app and
-	 * gets set of files from CouchBase
+	 * This method starting tests application, configure TestBilling app and gets
+	 * set of files from CouchBase
 	 */
+	@Parameters({ "path-to-testApp" })
 	@BeforeClass
-	private void startBilling() throws IOException, InterruptedException {
+	private void startBilling(String pathToApp) throws IOException, InterruptedException {
 		Process p = Runtime.getRuntime().exec(pathToApp);
 		p.getInputStream();
 		Thread.sleep(10000);
 		Runtime.getRuntime().exec("taskkill /F /IM java.exe");
-		context = new AnnotationConfigApplicationContext("by.intexsoft.test.config");
+		context = new AnnotationConfigApplicationContext("main.by.intexsoft.testBilling.config");
 		service = context.getBean(RecordService.class);
 		sourceSet = getFileSet();
 		rezultSet = service.findAll();

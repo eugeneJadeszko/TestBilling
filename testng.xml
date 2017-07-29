@@ -1,8 +1,10 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 <suite name="TestSuite">
+	<parameter name="path-to-testApp" value="D:/work/CouchBaseRabbit/start.bat"></parameter>
+	<parameter name="path-to-incoming-message" value="D:/work/incoming_message"></parameter>
 	<test name="TestBilling">
 		<classes>
-			<class name="by.intexsoft.test.TestBilling" />
+			<class name="test.by.intexsoft.testBilling.TestBilling" />
 		</classes>
 	</test>
 </suite>
