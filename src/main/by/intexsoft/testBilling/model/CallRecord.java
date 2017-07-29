@@ -1,4 +1,4 @@
-package by.intexsoft.test.model;
+package main.by.intexsoft.testBilling.model;
 
 public class CallRecord {
 	public String callId;

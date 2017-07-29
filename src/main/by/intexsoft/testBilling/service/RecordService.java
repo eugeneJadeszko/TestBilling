@@ -1,12 +1,12 @@
-package by.intexsoft.test.service;
+package main.by.intexsoft.testBilling.service;
 
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import by.intexsoft.test.model.CallRecord;
-import by.intexsoft.test.repository.CouchBaseRepository;
+import main.by.intexsoft.testBilling.model.CallRecord;
+import main.by.intexsoft.testBilling.repository.CouchBaseRepository;
 
 @Service
 public class RecordService {

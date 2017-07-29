@@ -1,4 +1,4 @@
-package by.intexsoft.test.config;
+package main.by.intexsoft.testBilling.config;
 
 import java.util.Collections;
 import java.util.List;
@@ -13,10 +13,10 @@ import org.springframework.data.couchbase.repository.config.EnableCouchbaseRepos
 /**
  * This class configure Couchbase Server for further usage
  */
-@EnableCouchbaseRepositories(basePackages = "by.intexsoft.test.repository")
+@EnableCouchbaseRepositories(basePackages = "main.by.intexsoft.testBilling.repository")
 @PropertySource(value = "classpath:application.properties")
 @Configuration
-@ComponentScan(basePackages = "by.intexsoft.test.service")
+@ComponentScan(basePackages = "main.by.intexsoft.testBilling.service")
 public class CouchbaseConfig extends AbstractCouchbaseConfiguration {
 
 	@Value("${couchbase.host}")
