@@ -1,5 +1,7 @@
 package test.by.intexsoft.testBilling;
 
+import static org.testng.Assert.assertTrue;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Set;
@@ -24,11 +26,14 @@ public class TestBilling {
 
 	/**
 	 * This method compares objects from CouchBase with source objects from
-	 * directory
+	 * directory, checks error.log file status and checks directory with invalid
+	 * files
 	 */
 	@Test
 	public void check() {
 		Assert.assertNotEqualsDeep(rezultSet, sourceSet);
+		assertTrue(utility.getLogErrStat());
+		assertTrue(utility.getInvalidFiles().length == 0);
 	}
 
 	/**
@@ -40,7 +45,7 @@ public class TestBilling {
 	private void startBilling(String pathToApp) throws IOException, InterruptedException {
 		Process p = Runtime.getRuntime().exec(pathToApp);
 		p.getInputStream();
-		Thread.sleep(10000);
+		Thread.sleep(15000);
 		Runtime.getRuntime().exec("taskkill /F /IM java.exe");
 		context = new AnnotationConfigApplicationContext("main.by.intexsoft.testBilling.config");
 		sourceSet = utility.getFileSet();
@@ -53,7 +58,7 @@ public class TestBilling {
 	@AfterMethod
 	public void clear() {
 		context.getBean(RecordService.class).deleteAll();
-		for (File item : utility.getFilesFromDir()) {
+		for (File item : utility.getReadFiles()) {
 			item.delete();
 		}
 		context.close();
