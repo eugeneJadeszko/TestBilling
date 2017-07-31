@@ -2,7 +2,6 @@ package test.by.intexsoft.testBilling;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.Set;
 
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -44,10 +43,8 @@ public class TestBilling {
 		Thread.sleep(10000);
 		Runtime.getRuntime().exec("taskkill /F /IM java.exe");
 		context = new AnnotationConfigApplicationContext("main.by.intexsoft.testBilling.config");
-		service = context.getBean(RecordService.class);
-		sourceSet = new HashSet<>();
 		sourceSet = utility.getFileSet();
-		rezultSet = service.findAll();
+		rezultSet = context.getBean(RecordService.class).findAll();
 	}
 
 	/**
@@ -55,7 +52,7 @@ public class TestBilling {
 	 */
 	@AfterMethod
 	public void clear() {
-		service.deleteAll();
+		context.getBean(RecordService.class).deleteAll();
 		for (File item : utility.getFilesFromDir()) {
 			item.delete();
 		}
