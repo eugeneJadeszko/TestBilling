@@ -14,6 +14,7 @@ import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
 import main.by.intexsoft.testBilling.model.CallRecord;
+import main.by.intexsoft.testBilling.service.RabbitService;
 import main.by.intexsoft.testBilling.service.RecordService;
 import main.by.intexsoft.testBilling.utility.Utility;
 
@@ -45,9 +46,11 @@ public class TestBilling {
 	private void startBilling(String pathToApp) throws IOException, InterruptedException {
 		Process p = Runtime.getRuntime().exec(pathToApp);
 		p.getInputStream();
-		Thread.sleep(15000);
-		Runtime.getRuntime().exec("taskkill /F /IM java.exe");
+		Thread.sleep(820);
 		context = new AnnotationConfigApplicationContext("main.by.intexsoft.testBilling.config");
+		do {
+		} while (context.getBean(RabbitService.class).getMessageCount() != 0);
+		Runtime.getRuntime().exec("taskkill /F /IM java.exe");
 		sourceSet = utility.getFileSet();
 		rezultSet = context.getBean(RecordService.class).findAll();
 	}
